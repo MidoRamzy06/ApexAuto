@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in – ApexAuto</title>
+  <!-- Atkinson Hyperlegible: high legibility typography for visual distinction -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;display=swap">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <!-- WCAG 2.4.1 Bypass Blocks: Skip link allows keyboard/screen-reader users to skip header navigation -->
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <!-- Landmark: Site Header -->
+  <header class="site-header">
+    <div class="brand-group">
+      <p class="brand">ApexAuto <span class="brand-sub">Garage Service Reception &amp; Workshop Records</span></p>
+    </div>
+    
+    <!-- Landmark: Main Navigation (hidden until signed in) -->
+    <nav id="main-nav" aria-label="Main navigation" hidden>
+      <ul class="nav-list">
+        <li><a href="#/dashboard">Dashboard</a></li>
+        <li><a href="#/new">Book in vehicle</a></li>
+        <li><a href="#/orders">All service orders</a></li>
+      </ul>
+    </nav>
+
+    <!-- User status badge & Sign out button (hidden until signed in) -->
+    <div id="user-box" class="user-box" hidden>
+      <span id="user-label" class="user-pill"></span>
+      <button type="button" id="signout" class="btn btn-secondary">Sign out</button>
+    </div>
+  </header>
+
+  <!-- WCAG 4.1.3 Status Messages: Pre-rendered live regions for assertive alerts & polite status updates -->
+  <div id="status" class="message" role="status" aria-live="polite" aria-atomic="true"></div>
+  <div id="alert" class="message message-error" role="alert" aria-live="assertive" aria-atomic="true"></div>
+
+  <!-- Landmark: Main Content -->
+  <main id="main">
+    
+    <!-- SCREEN 1: SIGN IN (Simulated authentication) -->
+    <section id="view-signin" class="panel narrow" aria-labelledby="h-signin">
+      <h1 id="h-signin" tabindex="-1">Staff Sign in</h1>
+      <p class="text-muted">Enter any username and password for this coursework simulation. Select your role to test access permissions.</p>
+      
+      <form id="signin-form" novalidate>
+        <!-- Accessible Error Summary (Gov.uk pattern) -->
+        <div id="signin-error-summary" class="error-summary" role="alert" aria-labelledby="signin-error-title" tabindex="-1" hidden>
+          <h2 id="signin-error-title">There is a problem</h2>
+          <ul id="signin-error-list"></ul>
+        </div>
+
+        <div class="field">
+          <label for="username">Username <span class="req" aria-hidden="true">*</span></label>
+          <input id="username" name="username" type="text" autocomplete="username" required aria-required="true" aria-describedby="username-error">
+          <span class="error" id="username-error"></span>
+        </div>
+
+        <div class="field">
+          <label for="password">Password <span class="req" aria-hidden="true">*</span></label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required aria-required="true" aria-describedby="password-error">
+          <span class="error" id="password-error"></span>
+        </div>
+
+        <div class="field">
+          <label for="role">Staff role</label>
+          <select id="role" name="role" aria-describedby="role-hint">
+            <option value="Service advisor">Service advisor (book in vehicles &amp; mark work complete)</option>
+            <option value="Manager">Workshop manager (includes permanent record deletion)</option>
+          </select>
+          <span class="hint" id="role-hint">Workshop managers hold elevated permissions to delete completed or cancelled records.</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Sign in</button>
+      </form>
+    </section>
+
+    <!-- SCREEN 2: DASHBOARD (Summary statistics & triage) -->
+    <section id="view-dashboard" class="panel" aria-labelledby="h-dash" hidden>
+      <h1 id="h-dash" tabindex="-1">Workshop Dashboard</h1>
+      <p class="lead">Welcome back, <strong id="dash-name">Staff Member</strong>. Here is today's workshop status overview.</p>
+      
+      <!-- Metrics Overview -->
+      <section aria-labelledby="h-today">
+        <h2 id="h-today">Today in the workshop</h2>
+        <dl class="stats">
+          <div class="stat-card stat-onloan">
+            <dt>In progress</dt>
+            <dd id="stat-onloan">&ndash;</dd>
+          </div>
+          <div class="stat-card stat-overdue">
+            <dt>Awaiting collection</dt>
+            <dd id="stat-overdue">&ndash;</dd>
+          </div>
+          <div class="stat-card stat-returned">
+            <dt>Completed</dt>
+            <dd id="stat-returned">&ndash;</dd>
+          </div>
+        </dl>
+      </section>
+
+      <!-- Actionable Collection Triage List -->
+      <section aria-labelledby="h-overdue" class="mt-4">
+        <div class="section-heading-row">
+          <h2 id="h-overdue">Vehicles awaiting customer collection</h2>
+          <span id="overdue-badge" class="badge badge-overdue" hidden>0 awaiting collection</span>
+        </div>
+        <p id="overdue-empty" class="text-muted" hidden>No vehicles awaiting collection. All completed vehicles have been collected.</p>
+        <ul id="overdue-list" class="action-list" aria-live="polite"></ul>
+        <div class="dashboard-actions">
+          <a class="btn btn-primary" href="#/new">Book in new vehicle</a>
+          <a class="btn btn-secondary" href="#/orders">View and search all repair orders</a>
+        </div>
+      </section>
+    </section>
+
+    <!-- SCREEN 3: DATA ENTRY (Non-trivial form with dynamic disclosure & validation) -->
+    <section id="view-new" class="panel narrow" aria-labelledby="h-new" hidden>
+      <h1 id="h-new" tabindex="-1">Book in Vehicle</h1>
+      <p class="text-muted">Create a repair job intake order. Fields marked with an asterisk (<span class="req" aria-hidden="true">*</span>) are mandatory.</p>
+      
+      <form id="order-form" novalidate>
+        <!-- Accessible Error Summary -->
+        <div id="order-error-summary" class="error-summary" role="alert" aria-labelledby="order-error-title" tabindex="-1" hidden>
+          <h2 id="order-error-title">There is a problem</h2>
+          <ul id="order-error-list"></ul>
+        </div>
+
+        <!-- Customer Information Group -->
+        <fieldset>
+          <legend>Customer information</legend>
+          <div class="field">
+            <label for="customer_name">Customer full name <span class="req" aria-hidden="true">*</span></label>
+            <input id="customer_name" name="customer_name" type="text" autocomplete="off" required aria-required="true" aria-describedby="customer_name-error">
+            <span class="error" id="customer_name-error"></span>
+          </div>
+
+          <div class="field">
+            <label for="phone_number">Contact telephone number <span class="req" aria-hidden="true">*</span></label>
+            <input id="phone_number" name="phone_number" type="tel" inputmode="tel" autocomplete="off" required aria-required="true" aria-describedby="phone_number-hint phone_number-error">
+            <span class="hint" id="phone_number-hint">At least 10 digits (e.g. 07700 900123).</span>
+            <span class="error" id="phone_number-error"></span>
+          </div>
+        </fieldset>
+
+        <!-- Vehicle & Service Details Group -->
+        <fieldset>
+          <legend>Vehicle &amp; service details</legend>
+          <div class="field">
+            <label for="reg_number">Vehicle registration plate <span class="req" aria-hidden="true">*</span></label>
+            <input id="reg_number" name="reg_number" type="text" autocomplete="off" required aria-required="true" aria-describedby="reg_number-hint reg_number-error">
+            <span class="hint" id="reg_number-hint">UK format registration plate (e.g. AB12 CDE). Automatically capitalized.</span>
+            <span class="error" id="reg_number-error"></span>
+          </div>
+
+          <div class="field">
+            <label for="service_type">Service category <span class="req" aria-hidden="true">*</span></label>
+            <!-- Dynamic disclosure: selecting 'Other' reveals the custom fault description below -->
+            <select id="service_type" name="service_type" required aria-required="true" aria-controls="service-other-field" aria-expanded="false" aria-describedby="service_type-error">
+              <option value="">Select a service category</option>
+              <option value="Full Annual Service">Full Annual Service</option>
+              <option value="MOT Inspection">MOT Inspection &amp; Certification</option>
+              <option value="Brake &amp; Tyre Service">Brake &amp; Tyre Replacement</option>
+              <option value="Engine Diagnostics">Engine &amp; Electrical Diagnostics</option>
+              <option value="Other">Other / Custom repair (specify below)</option>
+            </select>
+            <span class="error" id="service_type-error"></span>
+          </div>
+
+          <!-- DYNAMICALLY-APPEARING FIELD -->
+          <div class="field" id="service-other-field" hidden>
+            <label for="service_other">Custom work or fault description <span class="req" aria-hidden="true">*</span></label>
+            <input id="service_other" name="service_other" type="text" autocomplete="off" aria-describedby="service_other-hint service_other-error">
+            <span class="hint" id="service_other-hint">Describe specific symptoms or custom mechanical requirements.</span>
+            <span class="error" id="service_other-error"></span>
+          </div>
+        </fieldset>
+
+        <!-- Priority Turnaround Radios -->
+        <fieldset>
+          <legend>Priority turnaround schedule</legend>
+          <div class="choice-group">
+            <div class="choice">
+              <input type="radio" id="days-1" name="turnaround_days" value="1">
+              <label for="days-1">1 day (express turnaround)</label>
+            </div>
+            <div class="choice">
+              <input type="radio" id="days-3" name="turnaround_days" value="3" checked>
+              <label for="days-3">3 days (standard workshop queue)</label>
+            </div>
+            <div class="choice">
+              <input type="radio" id="days-7" name="turnaround_days" value="7">
+              <label for="days-7">7 days (major diagnostic / parts order overhaul)</label>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Intake Checklist Checkboxes -->
+        <fieldset>
+          <legend>Intake safety &amp; equipment checklist</legend>
+          <div class="choice-grid">
+            <div class="choice">
+              <input type="checkbox" id="chk-key" name="intake_checklist" value="Key tag attached">
+              <label for="chk-key">Customer key tag attached</label>
+            </div>
+            <div class="choice">
+              <input type="checkbox" id="chk-nut" name="intake_checklist" value="Locking wheel nut present">
+              <label for="chk-nut">Locking wheel nut verified in boot</label>
+            </div>
+            <div class="choice">
+              <input type="checkbox" id="chk-valet" name="intake_checklist" value="Valet wash requested">
+              <label for="chk-valet">Valet wash on completion</label>
+            </div>
+            <div class="choice">
+              <input type="checkbox" id="chk-courtesy" name="intake_checklist" value="Courtesy car issued">
+              <label for="chk-courtesy">Courtesy loan car issued</label>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Optional Notes -->
+        <div class="field">
+          <label for="notes">Customer symptoms or technician notes (optional)</label>
+          <textarea id="notes" name="notes" rows="3" maxlength="300" aria-describedby="notes-hint"></textarea>
+          <span class="hint" id="notes-hint">Record pre-existing bodywork scratches or specific customer notes (max 300 characters).</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save repair order</button>
+      </form>
+    </section>
+
+    <!-- SCREEN 4: DATA TABLE (Search, filter, column sort, pagination, and actions) -->
+    <section id="view-orders" class="panel" aria-labelledby="h-orders" hidden>
+      <h1 id="h-orders" tabindex="-1">All Service Orders</h1>
+      
+      <!-- Filter and Search Controls -->
+      <form id="filters" class="filters" role="search" aria-label="Filter service orders">
+        <div class="field">
+          <label for="q">Search records</label>
+          <input id="q" type="search" placeholder="Customer name, phone, or registration plate" autocomplete="off">
+        </div>
+
+        <div class="field">
+          <label for="status-filter">Status filter</label>
+          <select id="status-filter">
+            <option value="">All statuses</option>
+            <option value="In progress">In progress</option>
+            <option value="Awaiting collection">Awaiting collection</option>
+            <option value="Completed">Completed</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="sort-select">Sort by</label>
+          <select id="sort-select">
+            <option value="due_date:asc">Estimated completion (earliest first)</option>
+            <option value="due_date:desc">Estimated completion (latest first)</option>
+            <option value="customer:asc">Customer name (A to Z)</option>
+            <option value="customer:desc">Customer name (Z to A)</option>
+            <option value="reg_number:asc">Vehicle registration (A to Z)</option>
+            <option value="status:asc">Status</option>
+          </select>
+        </div>
+
+        <div class="filters-action">
+          <button type="button" id="clear-filters" class="btn btn-secondary">Clear filters</button>
+        </div>
+      </form>
+
+      <!-- Results feedback -->
+      <div class="results-bar">
+        <p id="result-count" class="result-count" aria-live="polite">Loading records&hellip;</p>
+        <p id="loading" class="loading" hidden><span class="spinner" aria-hidden="true"></span> Loading orders&hellip;</p>
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty" class="empty-state" hidden>
+        <p class="empty-title">No matching service orders found</p>
+        <p class="text-muted">Try adjusting your search terms or clearing the status filter.</p>
+        <button type="button" id="empty-clear" class="btn btn-secondary">Show all orders</button>
+      </div>
+
+      <!-- Accessible Data Table with Responsive Card Transform -->
+      <div id="table-wrap" class="table-container" aria-busy="false">
+        <table class="orders-table">
+          <caption class="sr-only">Vehicle repair orders database table with sorting controls</caption>
+          <thead>
+            <tr>
+              <th scope="col" aria-sort="none">
+                <button type="button" class="sort-btn" data-sort="customer">Customer</button>
+              </th>
+              <th scope="col" aria-sort="none">
+                <button type="button" class="sort-btn" data-sort="reg_number">Vehicle Reg</button>
+              </th>
+              <th scope="col">Service</th>
+              <th scope="col" aria-sort="none">
+                <button type="button" class="sort-btn" data-sort="due_date">Est. Completion</button>
+              </th>
+              <th scope="col" aria-sort="none">
+                <button type="button" class="sort-btn" data-sort="status">Status</button>
+              </th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="order-rows"></tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Navigation -->
+      <nav class="pager" aria-label="Table pagination">
+        <button type="button" class="btn btn-secondary" data-dir="-1" id="btn-prev-page">Previous page</button>
+        <span id="page-info" class="page-info" aria-live="polite"></span>
+        <button type="button" class="btn btn-secondary" data-dir="1" id="btn-next-page">Next page</button>
+      </nav>
+    </section>
+
+  </main>
+
+  <!-- Modal Confirmation Dialog (WCAG 2.1.2: No keyboard trap, Esc cancels, returns focus) -->
+  <dialog id="confirm-dialog" aria-modal="true" aria-labelledby="cd-title" aria-describedby="cd-text">
+    <form method="dialog" class="dialog-content">
+      <h2 id="cd-title">Confirm Record Deletion</h2>
+      <p id="cd-text"></p>
+      <div class="dialog-actions">
+        <button value="cancel" class="btn btn-secondary" autofocus>Cancel</button>
+        <button value="ok" class="btn btn-danger">Delete order</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Landmark: Site Footer -->
+  <footer class="site-footer">
+    <p>ApexAuto Records Management &bull; Built to WCAG 2.1 Level AA Accessibility Standards &bull; Simulated authentication session</p>
+  </footer>
+
+</body>
+</html>
