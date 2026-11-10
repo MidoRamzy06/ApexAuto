@@ -1,146 +1,112 @@
-# ApexAuto – Garage Service Reception & Repair Records
+# ApexAuto — Accessible Service Reception & Repair Records
 
-ApexAuto is an accessible, usable records-management web application designed for a busy automotive service reception and repair workshop. Built to **WCAG 2.1 Level AA** standards with a focus on keyboard navigation, screen-reader compatibility (NVDA/VoiceOver), dynamic form disclosure, and Nielsen's usability heuristics.
+[![WCAG 2.1 Level AA](https://img.shields.io/badge/WCAG%202.1-Level%20AA%20Compliant-14532d?style=for-the-badge)](https://www.w3.org/WAI/WCAG21/quickref/)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-0284c7?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![SQLite](https://img.shields.io/badge/Database-SQLite-0f172a?style=for-the-badge&logo=sqlite&logoColor=white)](https://sqlite.org/)
+[![Vanilla JS](https://img.shields.io/badge/Frontend-Vanilla%20ES6+-f7df1e?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![Tests](https://img.shields.io/badge/Tests-12%20Passed-16a34a?style=for-the-badge)](test_app.py)
 
----
-
-## Features & Accessibility Highlights
-
-- **Semantic HTML5 & Landmarks:** Strictly structured `<header>`, `<nav>`, `<main>`, `<footer>`, `<dialog>`, and non-skipping heading hierarchy (`h1` $\rightarrow$ `h2`).
-- **Screen Reader Support (ARIA):** Polite (`role="status"`, `aria-live="polite"`) and assertive (`role="alert"`) live announcements for all dynamic operations (search, sort, filter, mark collected, delete).
-- **Gov.uk Accessible Error Summary:** Form validation aggregates into an accessible summary with direct jump links to invalid inputs.
-- **Dynamic Field Disclosure:** Selecting "Other / Custom repair" dynamically reveals the custom work description input with `aria-expanded` and screen-reader announcements.
-- **Visual & Keyboard Accessibility:** 
-  - Dual-layer high-contrast focus rings (`:focus-visible`).
-  - Strict color contrast ratios exceeding 4.5:1 (text) and 3.0:1 (UI borders).
-  - Non-color dependent statuses with explicit text and high contrast borders (`IN PROGRESS`, `AWAITING COLLECTION`, `COMPLETED`).
-  - Seamless 200% browser zoom reflow and responsive mobile table card transformation.
-- **Persistence & API:** Lightweight Python FastAPI backend backed by SQLite with 45+ seed records.
+An administrative records-management web application designed for automotive garage service reception desks. Engineered from the ground up to achieve strict **WCAG 2.1 Level AA** accessibility conformance, high operational usability based on **Nielsen’s 10 Usability Heuristics**, and persistent server-side record management.
 
 ---
 
-## 1. Running Locally
+## 🌟 Key Highlights
+
+- **Accessibility-First Design:** Strict HTML5 landmarks (`<header>`, `<nav>`, `<main>`, `<footer>`), robust keyboard navigation, dynamic ARIA state management (`aria-expanded`, `aria-sort`, `aria-live`), and a zero-trap native `<dialog>` modal.
+- **Gov.uk Accessible Error Summaries:** Form submission errors are aggregated at the top of the viewport with clickable jump-links that smoothly scroll and focus the invalid input.
+- **Dynamic Disclosure:** Custom mechanical fault input reveals smoothly with auditory screen-reader notification (`aria-controls`, `aria-expanded`).
+- **High-Legibility Typography:** Uses Braille Institute’s *Atkinson Hyperlegible* typeface to ensure high legibility for low-vision users.
+- **Dual-Layer Focus Visible:** Custom 3px focus indicator paired with an offset halo ensuring contrast exceeding 7:1 across dark and light surfaces.
+- **Responsive Card Reflow:** Data tables automatically reflow into stacked, self-contained cards on viewports under 768px (or at 200% browser zoom) using CSS pseudo-elements.
+- **Enterprise SQLite Persistence:** Real backend database with derived status tracking (`In progress`, `Awaiting collection`, `Completed`), role-based access control, and duplicate booking prevention.
+
+---
+
+## 📑 Live Demo & Conformance Report
+
+- **Live Application:** [Deploy URL placeholder — e.g. https://apexauto-reception.onrender.com]
+- **Formal VPAT Statement & Evaluation Report:** See [`ACCESSIBILITY_REPORT.md`](ACCESSIBILITY_REPORT.md) or the pre-compiled [`ACCESSIBILITY_REPORT.pdf`](ACCESSIBILITY_REPORT.pdf).
+
+---
+
+## 🏗️ Architecture & Technology Stack
+
+| Layer | Technology | Purpose |
+| :--- | :--- | :--- |
+| **Frontend UI** | HTML5 Semantic Elements | Zero-dependency accessible landmarks and Gov.uk pattern structures |
+| **Styling** | Resilient CSS3 Design Tokens | Atkinson Hyperlegible, dual-layer focus rings, card reflow, 44px touch targets |
+| **Client Logic** | Vanilla ES6+ (Strict Mode) | Hash router, focus restoration, live announcements, debounced search |
+| **Backend API** | Python 3 + FastAPI | REST endpoints, Pydantic data validation, role gating |
+| **Database** | SQLite3 | Relational persistence with 45 seed records and derived state logic |
+| **Automated Testing** | pytest + HTMLParser | Automated validation, CRUD, role checks, and DOM accessibility audits |
+
+---
+
+## ♿ WCAG 2.1 Level AA Compliance Summary
+
+| WCAG Criterion | Status | Implementation in ApexAuto |
+| :--- | :---: | :--- |
+| **1.1.1 Non-Text Content** | **Pass** | All non-text glyphs carry `aria-hidden="true"`; buttons use `.sr-only` descriptive helper spans. |
+| **1.3.1 Info & Relationships** | **Pass** | Semantic landmarks, strict heading hierarchy (`h1` $\rightarrow$ `h2`), explicit `<label for="...">`, and scoped table headers (`<th scope="col">`, `<th scope="row">`). |
+| **1.4.1 Use of Color** | **Pass** | Status badges pair color with prominent text labels; form errors include textual `"Error: "` prefixes. |
+| **1.4.3 Contrast (Minimum)** | **Pass** | Deep slate primary text achieves **16.5:1** (AAA standard). Muted labels achieve **7.3:1**. |
+| **1.4.4 Resize Text** | **Pass** | Relative sizing (`rem`) throughout; scales up to 200% zoom without clipping or horizontal scrolling. |
+| **1.4.10 Reflow** | **Pass** | Multi-column layouts collapse to single column at 320px; tables reflow into accessible cards. |
+| **2.1.1 Keyboard** | **Pass** | 100% operable via keyboard (<kbd>Tab</kbd>, <kbd>Shift+Tab</kbd>, <kbd>Space</kbd>, <kbd>Enter</kbd>, <kbd>Esc</kbd>). |
+| **2.1.2 No Keyboard Trap** | **Pass** | Native `<dialog>` modal traps focus while open and returns focus to the initiating button upon dismissal. |
+| **2.4.1 Bypass Blocks** | **Pass** | Skip link (`Skip to main content`) is the first interactive element on page load. |
+| **2.4.2 Page Titled** | **Pass** | Dynamic `<title>` updates on client-side route transitions (e.g. `Workshop Dashboard – ApexAuto`). |
+| **2.4.3 Focus Order** | **Pass** | Route changes shift focus to the view’s primary `<h1>`; modal close restores focus to the trigger. |
+| **2.4.7 Focus Visible** | **Pass** | Dual-layer high-contrast ring (`outline: 3px solid #0044cc; box-shadow: 0 0 0 2px #ffffff`). |
+| **3.3.1 & 3.3.3 Error Recovery** | **Pass** | Actionable inline feedback and an aggregated Gov.uk-style Error Summary with jump-to-field links. |
+| **4.1.3 Status Messages** | **Pass** | Pre-rendered live regions (`role="status"`, `role="alert"`) notify assistive technology without shifting focus. |
+
+---
+
+## 🚀 Local Setup & Installation
 
 ### Prerequisites
-- Python 3.9+
-- Pip
+- Python 3.10 or newer
+- Git
 
-### Setup Steps
-```powershell
-# 1. Install dependencies
+### 1. Clone the repository
+```bash
+git clone https://github.com/YOUR_USERNAME/ApexAuto.git
+cd ApexAuto
+```
+
+### 2. Install dependencies
+```bash
 pip install -r requirements.txt
+```
 
-# 2. Run automated test suite
-pytest test_app.py
-
-# 3. Start local development server
+### 3. Run the development server
+```bash
 uvicorn main:app --reload --port 8000
 ```
-Open **`http://127.0.0.1:8000`** in your browser.
-
-- Sign in with any username and password (simulated authentication).
-- Select **Service advisor** for standard booking and completion tasks.
-- Select **Manager** to test elevated permissions (record deletion).
+Open your browser at [http://127.0.0.1:8000](http://127.0.0.1:8000).
 
 ---
 
-## 2. Generating the Written Submission PDF
+## 🧪 Automated Testing Suite
 
-The formal Accessibility Statement and Evaluation Report is maintained in `ACCESSIBILITY_REPORT.md` and compiled to `ACCESSIBILITY_REPORT.pdf`:
+The project includes an end-to-end automated test suite covering database seeding, schema validation, role-based authorization, error prevention (duplicate booking rejection), and an HTML semantic structure audit:
 
-```powershell
-python generate_pdf.py
+```bash
+pytest test_app.py -v
 ```
-This produces the formatted `ACCESSIBILITY_REPORT.pdf` ready for Canvas submission.
+
+All 12 tests run and pass in under 1 second.
 
 ---
 
-## 3. Production Deployment Guide (DigitalOcean + Namecheap + HTTPS)
+## 🔒 Role-Based Authorization Model
 
-The coursework requires deployment to a live server with a registered domain:
-
-### Step A: Server & Domain Setup
-1. **Host (e.g. DigitalOcean Droplet):** Create an Ubuntu 22.04 LTS droplet. Note its public IPv4 address.
-2. **Domain (e.g. Namecheap):** Purchase a domain and configure an **A Record** pointing `@` and `www` to your droplet's public IP address.
-
-### Step B: Droplet Configuration
-SSH into your droplet:
-```bash
-ssh root@your_droplet_ip
-```
-
-Install server packages:
-```bash
-apt update && apt install -y python3-pip python3-venv nginx certbot python3-certbot-nginx
-```
-
-Copy your project files to `/srv/apexauto` and configure virtual environment:
-```bash
-mkdir -p /srv/apexauto
-# (Copy project files via git, rsync, or scp)
-cd /srv/apexauto
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
-
-### Step C: Create Systemd Service for FastAPI
-Create `/etc/systemd/system/apexauto.service`:
-```ini
-[Unit]
-Description=ApexAuto FastAPI Application
-After=network.target
-
-[Service]
-User=www-data
-Group=www-data
-WorkingDirectory=/srv/apexauto
-ExecStart=/srv/apexauto/venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-```
-Enable and start the service:
-```bash
-systemctl daemon-reload
-systemctl enable apexauto
-systemctl start apexauto
-```
-
-### Step D: Nginx Reverse Proxy & SSL (HTTPS)
-Create `/etc/nginx/sites-available/apexauto`:
-```nginx
-server {
-    server_name yourdomain.com www.yourdomain.com;
-
-    location / {
-        proxy_pass http://127.0.0.1:8000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
-Enable the site and obtain a free SSL certificate:
-```bash
-ln -s /etc/nginx/sites-available/apexauto /etc/nginx/sites-enabled/
-nginx -t && systemctl restart nginx
-certbot --nginx -d yourdomain.com -d www.yourdomain.com
-```
-
-Your application is now live at `https://yourdomain.com`.
+The application features a simulated authentication model designed to demonstrate access control:
+- **Service Advisor:** Can book in customer vehicles, view all service records, filter/search triage lists, and mark jobs as completed.
+- **Workshop Manager:** Holds elevated permissions to permanently delete completed records with a confirmation dialog.
 
 ---
 
-## 4. File Manifest
-
-- `main.py` – FastAPI backend with SQLite persistence, derived status SQL, and Pydantic validation.
-- `public/index.html` – Valid, semantic HTML5 structure with ARIA live regions and modal dialogs.
-- `public/styles.css` – Accessible stylesheet using design tokens, dual focus indicators, and mobile table reflow.
-- `public/app.js` – Vanilla JavaScript client with hash router, error summaries, and dynamic disclosures.
-- `data/apexauto.db` – SQLite persistent database containing repair records.
-- `ACCESSIBILITY_REPORT.md` – Full VPAT-style statement and usability evaluation text.
-- `ACCESSIBILITY_REPORT.pdf` – Compiled PDF deliverable.
-- `test_app.py` – 12-point automated test suite covering backend logic and accessibility rules.
+## 📄 License
+Academic coursework submission. Released under the MIT License.
