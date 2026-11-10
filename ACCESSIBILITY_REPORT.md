@@ -19,6 +19,7 @@ This report provides the formal **Accessibility Statement (VPAT-style)** documen
 
 ### Conformance Scope & Status
 * **Application:** ApexAuto Vehicle Service Reception & Records Management System
+* **Live Deployment URL:** [https://apexauto-3oes.onrender.com](https://apexauto-3oes.onrender.com)
 * **Guidelines:** Web Content Accessibility Guidelines (WCAG) 2.1 Level AA
 * **Overall Status:** Fully Conforming across all interactive screens (Sign-in, Dashboard, Book in Vehicle, and Service Orders Table).
 

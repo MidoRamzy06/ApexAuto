@@ -24,7 +24,7 @@ An administrative records-management web application designed for automotive gar
 
 ## 📑 Live Demo & Conformance Report
 
-- **Live Application:** [Deploy URL placeholder — e.g. https://apexauto-reception.onrender.com]
+- **Live Application:** [https://apexauto-3oes.onrender.com](https://apexauto-3oes.onrender.com)
 - **Formal VPAT Statement & Evaluation Report:** See [`ACCESSIBILITY_REPORT.md`](ACCESSIBILITY_REPORT.md) or the pre-compiled [`ACCESSIBILITY_REPORT.pdf`](ACCESSIBILITY_REPORT.pdf).
 
 ---
