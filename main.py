@@ -7,7 +7,7 @@ Accessible & Usable Records Management Coursework.
 import sqlite3
 from datetime import date, timedelta
 from pathlib import Path
-from typing import List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 from fastapi import FastAPI, Header, Query
 from fastapi.exceptions import RequestValidationError
@@ -200,7 +200,8 @@ def list_orders(
     col = SORT_COLUMNS.get(sort, "due_date")
     direction = "DESC" if order == "desc" else "ASC"
 
-    where, params = ["1=1"], {"today": date.today().isoformat()}
+    where = ["1=1"]
+    params: Dict[str, Any] = {"today": date.today().isoformat()}
 
     if q.strip():
         where.append("(customer_name LIKE :q OR phone_number LIKE :q OR reg_number LIKE :q)")
