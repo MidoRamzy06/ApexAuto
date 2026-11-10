@@ -1,51 +1,35 @@
-/**
- * ApexAuto Application JavaScript
- * Architecture: Vanilla ES6+, zero external framework dependencies.
- * Accessibility: WCAG 2.1 Level AA compliant with active focus management,
- * Gov.uk-style accessible error summaries, dynamic disclosures, and live announcements.
- */
-
+// ApexAuto - Client Application Logic (Vanilla ES6)
 (() => {
   'use strict';
 
-  /* ==========================================================================
-     1. DOM Helpers & Application State
-     ========================================================================== */
+  /* --- Helpers & State --- */
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
-  // WCAG 4.1.3: Live regions for polite notifications and assertive alerts
   const statusBox = $('#status');
   const alertBox = $('#alert');
   let notificationTimer = null;
 
-  // Application state
+  // App-level state
   const state = {
-    user: null,             // Current signed-in staff user { name, role }
-    sort: 'due_date',       // Current table sort column
+    user: null,             // Signed-in user object { name, role }
+    sort: 'due_date',       // Current table sort key
     order: 'asc',           // Sort direction: 'asc' | 'desc'
-    page: 1,                // Current table page
-    q: '',                  // Search query
-    status: '',             // Status filter: '' | 'In progress' | 'Awaiting collection' | 'Completed'
-    lastFocusedEl: null     // To restore focus after modal dismissals (WCAG 2.4.3)
+    page: 1,                // Current page number
+    q: '',                  // Search query string
+    status: '',             // Status filter
+    lastFocusedEl: null     // Restores focus after modal closes
   };
 
   const PAGE_SIZE = 10;
 
-  /**
-   * Clears any active notification banners immediately.
-   */
   function clearNotifications() {
     clearTimeout(notificationTimer);
     statusBox.textContent = '';
     alertBox.textContent = '';
   }
 
-  /**
-   * Dispatches polite screen-reader announcements via live region.
-   * Automatically clears visually after 4.5 seconds so notifications do not linger indefinitely.
-   * Satisfies WCAG 4.1.3 Status Messages.
-   */
+  // Announces status message; clears after 4.5 seconds to avoid stale notifications
   function announce(message, autoDismiss = true) {
     clearTimeout(notificationTimer);
     statusBox.textContent = '';
@@ -91,10 +75,7 @@
     });
   }
 
-  /**
-   * Safe DOM node builder preventing XSS (WCAG 1.3.1 Info & Relationships).
-   * Populates content using textContent rather than innerHTML.
-   */
+  // Safe DOM node builder avoiding innerHTML
   function el(tag, attrs = {}, ...children) {
     const node = document.createElement(tag);
     for (const [key, value] of Object.entries(attrs)) {
@@ -169,9 +150,7 @@
 
   state.user = loadUser();
 
-  /* ==========================================================================
-     3. Client-Side Accessible Router (WCAG 2.4.2 Page Titled & 2.4.3 Focus Order)
-     ========================================================================== */
+  /* --- Client Router --- */
   const views = {
     signin: { el: $('#view-signin'), title: 'Staff Sign in' },
     dashboard: { el: $('#view-dashboard'), title: 'Workshop Dashboard', load: loadDashboard },
@@ -283,11 +262,7 @@
     });
   }
 
-  /**
-   * Displays the Gov.uk-style accessible error summary at the top of the form,
-   * associates clickable links to each offending field, and shifts keyboard focus.
-   * Satisfies WCAG 3.3.1 (Error Identification) and 3.3.2 (Labels or Instructions).
-   */
+  // Populate and focus the top error summary
   function showErrors(formEl, errorList) {
     clearErrors(formEl);
     const summary = $('.error-summary', formEl);
@@ -484,11 +459,7 @@
     }
   };
 
-  /**
-   * Accessible Dynamic Disclosure:
-   * Only displays the extra text field when 'Other' is chosen.
-   * Updates aria-expanded and announces to screen readers.
-   */
+  // Reveal the custom fault description input when 'Other' is chosen
   function handleServiceTypeChange() {
     const isOther = orderForm.service_type.value === 'Other';
     otherField.hidden = !isOther;
@@ -728,9 +699,7 @@
     updateTableSortHeaders();
   }
 
-  /**
-   * WCAG 1.3.1 & 4.1.2: Applies aria-sort strictly to active th elements
-   */
+  // Update th aria-sort and sort direction arrows
   function updateTableSortHeaders() {
     $$('.sort-btn').forEach(btn => {
       const th = btn.closest('th');
@@ -843,9 +812,7 @@
     }
   });
 
-  /* ==========================================================================
-     9. Modal Dialog (WCAG 2.1.2 No Keyboard Trap & Focus Management)
-     ========================================================================== */
+  // Delete confirmation modal dialog
   function openConfirmDialog(promptText) {
     return new Promise(resolve => {
       const dialogEl = $('#confirm-dialog');
@@ -860,11 +827,8 @@
     });
   }
 
-  /* ==========================================================================
-     10. Keyboard Navigation Shortcuts (Usability Heuristics)
-     ========================================================================== */
+  // Keyboard shortcut: '/' jumps to search bar, 'Escape' clears it
   document.addEventListener('keydown', event => {
-    // Press '/' to jump to table search bar when viewing orders
     if (event.key === '/' && location.hash === '#/orders') {
       const activeTagName = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
       if (activeTagName !== 'input' && activeTagName !== 'textarea' && activeTagName !== 'select') {
@@ -875,7 +839,6 @@
       }
     }
 
-    // Press Escape in search bar to clear it
     if (event.key === 'Escape' && document.activeElement === $('#q') && $('#q').value) {
       event.preventDefault();
       $('#q').value = '';
@@ -885,9 +848,7 @@
     }
   });
 
-  /* ==========================================================================
-     11. Application Bootstrapping
-     ========================================================================== */
+  // Init
   restoreOrderDefaults();
   route();
 

@@ -1,45 +1,37 @@
-/* ==========================================================================
-   ApexAuto Stylesheet
-   - Strict WCAG 2.1 AA Compliance
-   - Relative sizing (rem/em) for resilience at 200% browser zoom
-   - Dual-layer focus indicator for high contrast across all elements
-   - Responsive CSS Grid & Flexbox layout with mobile card table reflow
-   ========================================================================== */
+/* --- ApexAuto Theme & Reset --- */
 
-/* Design Tokens: all color pairings tested >= 4.5:1 (normal text) and >= 3:1 (UI components) */
 :root {
-  --bg: #f8fafc;               /* Page background: clean soft slate */
-  --surface: #ffffff;          /* Card/panel surface */
-  --ink: #0f172a;              /* Primary text (contrast against white: 17.8:1 - AAA) */
-  --muted: #475569;            /* Secondary/hint text (contrast against white: 7.6:1 - AAA) */
-  --line: #475569;             /* Input and border line (contrast against white: 7.6:1) */
-  --soft-line: #cbd5e1;        /* Subtle separator line */
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --ink: #0f172a;              /* Primary text */
+  --muted: #475569;            /* Secondary & hint text */
+  --line: #475569;             /* Input borders */
+  --soft-line: #cbd5e1;
   
-  --focus: #0044cc;            /* High-visibility focus ring (contrast against white: 7.8:1) */
-  --focus-offset: #ffffff;     /* Offset ring for contrast on dark buttons */
+  --focus: #0044cc;            /* High-contrast focus outline */
+  --focus-offset: #ffffff;
   
-  --danger: #990000;           /* Error / danger text (contrast against white: 8.9:1) */
-  --danger-bg: #fee2e2;        /* Error background */
-  --danger-line: #b91c1c;      /* Error border */
+  --danger: #990000;
+  --danger-bg: #fee2e2;
+  --danger-line: #b91c1c;
   
-  --ok: #14532d;               /* Success text (contrast against white: 8.3:1) */
-  --ok-bg: #dcfce7;            /* Success background */
-  --ok-line: #16a34a;          /* Success border */
+  --ok: #14532d;
+  --ok-bg: #dcfce7;
+  --ok-line: #16a34a;
   
-  --info: #075985;             /* Status text (contrast against white: 6.6:1) */
-  --info-bg: #e0f2fe;          /* Status background */
-  --info-line: #0284c7;        /* Status border */
+  --info: #075985;
+  --info-bg: #e0f2fe;
+  --info-line: #0284c7;
   
   --radius: 0.375rem;
   --transition: 0.15s ease-in-out;
 }
 
-/* Base reset */
 *, *::before, *::after {
   box-sizing: border-box;
 }
 
-/* Ensure [hidden] always hides elements regardless of display property rules (HTML5 / WCAG standard) */
+/* Force hidden attribute to override flex/grid rules */
 [hidden] {
   display: none !important;
 }
@@ -93,7 +85,7 @@ p {
   margin-top: 1.5rem;
 }
 
-/* WCAG 2.4.7 Focus Visible: Dual-layer outline is clearly visible on white, dark, or colored buttons */
+/* Two-layer focus ring so it stands out against dark and light backgrounds */
 :focus-visible {
   outline: 3px solid var(--focus) !important;
   outline-offset: 3px !important;
@@ -773,7 +765,7 @@ dialog h2 {
   margin: 0;
 }
 
-/* Responsive Table Reflow: At <= 48rem (768px) or 200% zoom, table becomes stacked cards */
+/* Small screens: transform table rows into stacked cards */
 @media (max-width: 48rem) {
   .orders-table thead {
     position: absolute;

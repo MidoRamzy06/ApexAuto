@@ -1,24 +1,17 @@
 """
-Automated Test Suite for ApexAuto
-Covers:
-1. Backend API & SQLite database logic (FastAPI + Pydantic)
-2. Role-based authorization enforcement (Service Advisor vs. Workshop Manager)
-3. Input validation & error prevention rules (Duplicate booking prevention)
-4. WCAG 2.1 AA HTML accessibility & semantic structural compliance
+Test suite for ApexAuto: API endpoints, validation, role permissions, and DOM structure.
 """
-import re
 from html.parser import HTMLParser
 from pathlib import Path
-import pytest
 from fastapi.testclient import TestClient
 
-from main import app, db, STATUS_SQL
+from main import app, db
 
 client = TestClient(app)
 
-# ==============================================================================
-# 1. Database & Seed Data Tests
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# Database & Seed Data
+# ------------------------------------------------------------------------------
 def test_database_initialization():
     """Verify that seed orders exist and contain valid fields."""
     with db() as con:
@@ -35,9 +28,9 @@ def test_stats_endpoint():
     assert "completed" in data
     assert data["in_progress"] + data["awaiting_collection"] + data["completed"] >= 45
 
-# ==============================================================================
-# 2. Filtering, Sorting & Pagination Tests
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# 2. Filtering, Sorting & Pagination
+# ------------------------------------------------------------------------------
 def test_list_orders_pagination():
     """Verify page sizing and total count calculation."""
     res = client.get("/api/orders?page=1&page_size=10")
@@ -62,9 +55,9 @@ def test_list_orders_search():
     assert len(items) >= 1
     assert "Marcus" in items[0]["customer_name"]
 
-# ==============================================================================
-# 3. Validation & Error Prevention (Nielsen Heuristic #5)
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# 3. Validation & Business Logic Tests
+# ------------------------------------------------------------------------------
 def test_validation_missing_fields():
     """Submitting empty payload must return structured 422 validation errors."""
     res = client.post("/api/orders", json={})
@@ -124,9 +117,9 @@ def test_error_prevention_duplicate_booking():
     assert res_conflict.status_code == 409
     assert "already currently booked in" in res_conflict.json()["errors"][0]["message"]
 
-# ==============================================================================
-# 4. Role Authorization & Action Tests
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# 4. Role Authorization & Actions
+# ------------------------------------------------------------------------------
 def test_complete_order():
     """Completing an order updates completed_at and sets status to Completed."""
     create_res = client.post("/api/orders", json={
@@ -163,9 +156,9 @@ def test_delete_order_permission_check():
     assert res_mgr.status_code == 200
     assert res_mgr.json()["ok"] is True
 
-# ==============================================================================
-# 5. WCAG 2.1 AA HTML Semantic & Accessibility Audit
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# 5. HTML Semantic Structure Audit
+# ------------------------------------------------------------------------------
 class HTMLAccessibilityChecker(HTMLParser):
     def __init__(self):
         super().__init__()
@@ -189,8 +182,9 @@ class HTMLAccessibilityChecker(HTMLParser):
         if tag in ("input", "select", "textarea"):
             if tag_id:
                 self.input_ids.add(tag_id)
-            if "aria-describedby" in attr:
-                self.aria_describedby.append((tag_id, attr["aria-describedby"].split()))
+            desc_by = attr.get("aria-describedby")
+            if desc_by:
+                self.aria_describedby.append((tag_id, desc_by.split()))
         if tag in ("h1", "h2", "h3", "h4", "h5", "h6"):
             self.headings.append(int(tag[1]))
 
@@ -221,6 +215,3 @@ def test_html_accessibility_semantics():
     for inp, ref_list in checker.aria_describedby:
         for ref in ref_list:
             assert ref in checker.ids, f"aria-describedby reference '{ref}' on input '{inp}' does not exist!"
-
-if __name__ == "__main__":
-    pytest.main(["-v", __file__])

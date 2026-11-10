@@ -12,16 +12,15 @@
   <script src="app.js" defer></script>
 </head>
 <body>
-  <!-- WCAG 2.4.1 Bypass Blocks: Skip link allows keyboard/screen-reader users to skip header navigation -->
+  <!-- Skip link for keyboard users -->
   <a class="skip-link" href="#main">Skip to main content</a>
 
-  <!-- Landmark: Site Header -->
   <header class="site-header">
     <div class="brand-group">
       <p class="brand">ApexAuto <span class="brand-sub">Garage Service Reception &amp; Workshop Records</span></p>
     </div>
     
-    <!-- Landmark: Main Navigation (hidden until signed in) -->
+    <!-- Primary nav (shown after login) -->
     <nav id="main-nav" aria-label="Main navigation" hidden>
       <ul class="nav-list">
         <li><a href="#/dashboard">Dashboard</a></li>
@@ -30,27 +29,26 @@
       </ul>
     </nav>
 
-    <!-- User status badge & Sign out button (hidden until signed in) -->
+    <!-- User pill and sign out trigger -->
     <div id="user-box" class="user-box" hidden>
       <span id="user-label" class="user-pill"></span>
       <button type="button" id="signout" class="btn btn-secondary">Sign out</button>
     </div>
   </header>
 
-  <!-- WCAG 4.1.3 Status Messages: Pre-rendered live regions for assertive alerts & polite status updates -->
+  <!-- Live regions for async feedback and error alerts -->
   <div id="status" class="message" role="status" aria-live="polite" aria-atomic="true"></div>
   <div id="alert" class="message message-error" role="alert" aria-live="assertive" aria-atomic="true"></div>
 
-  <!-- Landmark: Main Content -->
   <main id="main">
     
-    <!-- SCREEN 1: SIGN IN (Simulated authentication) -->
+    <!-- Sign-in View -->
     <section id="view-signin" class="panel narrow" aria-labelledby="h-signin">
       <h1 id="h-signin" tabindex="-1">Staff Sign in</h1>
       <p class="text-muted">Enter any username and password for this coursework simulation. Select your role to test access permissions.</p>
       
       <form id="signin-form" novalidate>
-        <!-- Accessible Error Summary (Gov.uk pattern) -->
+        <!-- Form error summary -->
         <div id="signin-error-summary" class="error-summary" role="alert" aria-labelledby="signin-error-title" tabindex="-1" hidden>
           <h2 id="signin-error-title">There is a problem</h2>
           <ul id="signin-error-list"></ul>
@@ -81,7 +79,7 @@
       </form>
     </section>
 
-    <!-- SCREEN 2: DASHBOARD (Summary statistics & triage) -->
+    <!-- Dashboard View -->
     <section id="view-dashboard" class="panel" aria-labelledby="h-dash" hidden>
       <h1 id="h-dash" tabindex="-1">Workshop Dashboard</h1>
       <p class="lead">Welcome back, <strong id="dash-name">Staff Member</strong>. Here is today's workshop status overview.</p>
@@ -105,7 +103,7 @@
         </dl>
       </section>
 
-      <!-- Actionable Collection Triage List -->
+      <!-- Triage List -->
       <section aria-labelledby="h-overdue" class="mt-4">
         <div class="section-heading-row">
           <h2 id="h-overdue">Vehicles awaiting customer collection</h2>
@@ -120,19 +118,17 @@
       </section>
     </section>
 
-    <!-- SCREEN 3: DATA ENTRY (Non-trivial form with dynamic disclosure & validation) -->
+    <!-- Data Entry View -->
     <section id="view-new" class="panel narrow" aria-labelledby="h-new" hidden>
       <h1 id="h-new" tabindex="-1">Book in Vehicle</h1>
       <p class="text-muted">Create a repair job intake order. Fields marked with an asterisk (<span class="req" aria-hidden="true">*</span>) are mandatory.</p>
       
       <form id="order-form" novalidate>
-        <!-- Accessible Error Summary -->
         <div id="order-error-summary" class="error-summary" role="alert" aria-labelledby="order-error-title" tabindex="-1" hidden>
           <h2 id="order-error-title">There is a problem</h2>
           <ul id="order-error-list"></ul>
         </div>
 
-        <!-- Customer Information Group -->
         <fieldset>
           <legend>Customer information</legend>
           <div class="field">
@@ -149,7 +145,6 @@
           </div>
         </fieldset>
 
-        <!-- Vehicle & Service Details Group -->
         <fieldset>
           <legend>Vehicle &amp; service details</legend>
           <div class="field">
@@ -161,7 +156,7 @@
 
           <div class="field">
             <label for="service_type">Service category <span class="req" aria-hidden="true">*</span></label>
-            <!-- Dynamic disclosure: selecting 'Other' reveals the custom fault description below -->
+            <!-- Revealing 'Other' reveals the custom fault description below -->
             <select id="service_type" name="service_type" required aria-required="true" aria-controls="service-other-field" aria-expanded="false" aria-describedby="service_type-error">
               <option value="">Select a service category</option>
               <option value="Full Annual Service">Full Annual Service</option>
@@ -173,7 +168,7 @@
             <span class="error" id="service_type-error"></span>
           </div>
 
-          <!-- DYNAMICALLY-APPEARING FIELD -->
+          <!-- Revealed dynamically when 'Other' is chosen -->
           <div class="field" id="service-other-field" hidden>
             <label for="service_other">Custom work or fault description <span class="req" aria-hidden="true">*</span></label>
             <input id="service_other" name="service_other" type="text" autocomplete="off" aria-describedby="service_other-hint service_other-error">
@@ -235,7 +230,7 @@
       </form>
     </section>
 
-    <!-- SCREEN 4: DATA TABLE (Search, filter, column sort, pagination, and actions) -->
+    <!-- Orders Table View -->
     <section id="view-orders" class="panel" aria-labelledby="h-orders" hidden>
       <h1 id="h-orders" tabindex="-1">All Service Orders</h1>
       
@@ -286,7 +281,7 @@
         <button type="button" id="empty-clear" class="btn btn-secondary">Show all orders</button>
       </div>
 
-      <!-- Accessible Data Table with Responsive Card Transform -->
+      <!-- Table container -->
       <div id="table-wrap" class="table-container" aria-busy="false">
         <table class="orders-table">
           <caption class="sr-only">Vehicle repair orders database table with sorting controls</caption>
@@ -312,7 +307,7 @@
         </table>
       </div>
 
-      <!-- Pagination Navigation -->
+      <!-- Pagination -->
       <nav class="pager" aria-label="Table pagination">
         <button type="button" class="btn btn-secondary" data-dir="-1" id="btn-prev-page">Previous page</button>
         <span id="page-info" class="page-info" aria-live="polite"></span>
@@ -322,7 +317,7 @@
 
   </main>
 
-  <!-- Modal Confirmation Dialog (WCAG 2.1.2: No keyboard trap, Esc cancels, returns focus) -->
+  <!-- Delete Confirmation Modal -->
   <dialog id="confirm-dialog" aria-modal="true" aria-labelledby="cd-title" aria-describedby="cd-text">
     <form method="dialog" class="dialog-content">
       <h2 id="cd-title">Confirm Record Deletion</h2>

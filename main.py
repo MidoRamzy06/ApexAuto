@@ -20,7 +20,7 @@ DB_PATH = BASE / "data" / "apexauto.db"
 
 app = FastAPI(title="ApexAuto Service Reception API")
 
-# Whitelist of sortable columns: prevent SQL injection
+# Map client sort fields to SQL columns to avoid SQL injection
 SORT_COLUMNS = {
     "customer": "customer_name",
     "reg_number": "reg_number",
@@ -29,7 +29,7 @@ SORT_COLUMNS = {
     "service_type": "service_type"
 }
 
-# Status is derived from dates and completion timestamps to prevent data desynchronization
+# Derive live status dynamically from dates rather than storing a stale enum
 STATUS_SQL = """CASE WHEN completed_at IS NOT NULL THEN 'Completed'
                      WHEN due_date < :today THEN 'Awaiting collection'
                      ELSE 'In progress' END"""
@@ -166,7 +166,7 @@ class OrderIn(BaseModel):
 
 @app.exception_handler(RequestValidationError)
 async def validation_handler(request, exc):
-    """Standardized error format for accessibility error summary binding."""
+    # Shape FastAPI validation errors into a clean {field, message} list for the UI
     errors = [
         {
             "field": str(e["loc"][-1]) if len(e["loc"]) > 1 else "form",
@@ -215,7 +215,8 @@ def list_orders(
 
     with db() as con:
         total = con.execute(f"SELECT COUNT(*) FROM ({base_query}) WHERE {' AND '.join(where)}", params).fetchone()[0]
-        params.update(limit=page_size, offset=(page - 1) * page_size)
+        params["limit"] = page_size
+        params["offset"] = (page - 1) * page_size
         rows = con.execute(
             f"SELECT * FROM ({base_query}) WHERE {' AND '.join(where)} ORDER BY {col} {direction}, id LIMIT :limit OFFSET :offset",
             params
@@ -230,7 +231,7 @@ def create_order(order: OrderIn):
     reg = order.reg_number.strip().upper()
 
     with db() as con:
-        # Error prevention (Nielsen Heuristic #5): cannot check in the same car twice if job is already active
+        # Don't allow booking in the same vehicle if its current job isn't finished yet
         active_conflict = con.execute(
             "SELECT 1 FROM orders WHERE reg_number=? AND completed_at IS NULL",
             (reg,)
