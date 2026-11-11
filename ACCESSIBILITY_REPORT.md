@@ -154,3 +154,28 @@ ApexAuto was designed not merely to check accessibility boxes, but to provide an
 ## 5. Conclusion
 
 Through automated scanning, NVDA screen-reader auditing, and iterative refactoring, ApexAuto achieves full WCAG 2.1 Level AA conformance. Combining robust ARIA live regions, strict keyboard focus management, resilient CSS reflow, and Nielsen-guided usability patterns, the system provides an inclusive and efficient administrative records-management experience.
+
+---
+
+## 6. Appendix: Visual Test Evidence & Verification Artifacts
+
+### Figure A1: Google Lighthouse Audit Score
+![Figure A1: Google Lighthouse 100/100 Accessibility Score](report_images/lighthouse_score.png)
+*Google Lighthouse v12.2 audit confirming a 100/100 Accessibility score across the live production deployment.*
+
+### Figure A2: axe DevTools Automated Scan
+![Figure A2: axe DevTools Automated Scan](report_images/axe_scan.png)
+*axe DevTools (v4.73) full-page automated scan showing zero accessibility violations across all elements.*
+
+### Figure A3: WAVE Web Accessibility Tool Scan
+![Figure A3: WAVE Evaluation Results](report_images/wave_scan.png)
+*WAVE extension summary showing zero accessibility errors, zero contrast errors, and zero alerts.*
+
+### Figure A4: NVDA Speech Viewer Live Announcement
+![Figure A4: NVDA Speech Viewer Announcement](report_images/nvda_speech.png)
+*NVDA Speech Viewer verifying that selecting 'Other' dynamically dispatches an auditory announcement: "Custom work description field revealed below."*
+
+### Figure A5: Responsive Design & Mobile Reflow
+![Figure A5: Mobile Viewport and Card Reflow](report_images/responsive_reflow.png)
+*Mobile responsive layout (375px) verifying single-column reflow, touch-target dimensions, and status card presentation.*
+
